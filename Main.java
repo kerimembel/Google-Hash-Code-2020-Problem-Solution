@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 public class Main {
-	
+									//Needed Variables
 	static int book_count= 0;
 	static int library_count = 0;
 	static int day_count = 0;
@@ -23,20 +23,19 @@ public class Main {
 	
 	static String[] filenames = { "a_example", "b_read_on", "c_incunabula", "d_tough_choices", "e_so_many_books", "f_libraries_of_the_world" } ;
 	//static long[] bests = {21,5822900,5640234,4841980,4997725,5292375};
-	static long[] bests = {0,0,0,0,0,0};
+	static long[] bests = {0,0,0,0,0,0}; //Keeping Best Scores 
+	
 	
 	public static void main(String[] args) throws IOException {
-		ReadFiles();
-		
-	}
-	
+		ReadFiles();	
+	}	
+										//Read files and simulate one by one 
 	static void ReadFiles() throws IOException {
 		
-		for (int i = 2; i < filenames.length; i++) {
+		for (int i = 0; i < filenames.length; i++) {
 			
-				ReadDoc(filenames[i]);
-				Simulate(filenames[i]);
-			
+			ReadDoc(filenames[i]);
+			Simulate(filenames[i]);
 			
 		}
 	}
@@ -44,15 +43,17 @@ public class Main {
 		
 	static void Simulate(String filename) {
 		
-		long score = 0;
-		int signed_libraries = 0;
-		int[] books_scanned_already = new int[books.size()];
-		ScanObject temp = new ScanObject();
+		long score = 0;				//Calculated score
+		int signed_libraries = 0;	//Signed Library count
+		int[] books_scanned_already = new int[books.size()];	//Already scanned books
+		ScanObject temp = new ScanObject();						//An object to keep multiple variables.
 
-		Collections.sort(libraries, WeightComparator);
+		Collections.sort(libraries, WeightComparator);			//Sort Libraries by their weights
 
-		ArrayList<OrderObject> library_order = new ArrayList<OrderObject>();
+		ArrayList<OrderObject> library_order = new ArrayList<OrderObject>();	//Arraylist to keep which library signed 																
+																				//and which books are scanneed
 		
+		//Start looking through the sorted library list in order and continue until there is time
 		for (Library lib : libraries) {
 			day_count = day_count - lib.sign_time;
 			if(day_count >= 0) {
@@ -71,7 +72,7 @@ public class Main {
 			}
 		}
 		
-	
+		//Find previous best score 
 		long best_score = 0;
 		for (int i = 0; i < filenames.length; i++) {
 			if(filename == filenames[i])
@@ -81,8 +82,11 @@ public class Main {
 		System.out.println("Score    " + score + " for "+ filename);
 		System.out.println("Best was " + best_score + "\n");
 	
+		//If current score is better than best score than write into file
+		//After this process you may change the best score array manually.
 		if(score > best_score) {
 			String output = "";
+			//Writing simulation into output file
 			output +=signed_libraries +"\n";
 			
 			for (OrderObject orderObject : library_order) {
@@ -114,7 +118,7 @@ public class Main {
 		
 		int score = 0;
 		int book_index = 0;
-		ArrayList<Book> books_scanned_already = new ArrayList<Book>();
+		ArrayList<Book> books_scanned_now = new ArrayList<Book>();
 		
 		for (int i = 0; i < days_left; i++) {
 			for (int j = 0; j < lib.ship_limit; j++) {
@@ -123,7 +127,7 @@ public class Main {
 					book_index++;
 				
 				if(book_index < lib.books.size()) {
-					books_scanned_already.add(lib.books.get(book_index));
+					books_scanned_now.add(lib.books.get(book_index));
 					score += lib.books.get(book_index).score;
 					prev_scanned_books[lib.books.get(book_index).id] = 1;
 					book_index++;
@@ -133,11 +137,12 @@ public class Main {
 				break;
 			
 		}		
-		return new ScanObject(score,prev_scanned_books,books_scanned_already);
-		
+		return new ScanObject(score,prev_scanned_books,books_scanned_now);
 		
 	}
 
+	
+	//Reading files
 	static void ReadDoc(String file) throws IOException {
 		
 		int bid = 0;
@@ -178,16 +183,20 @@ public class Main {
 				sign = Integer.parseInt(words[1]);
 				ship = Integer.parseInt(words[2]);
 				
+				//Temp library to add into arraylist
 				Library temp = new Library(lid,num_books,sign,ship);
 				lid++;
 				
 				line = br.readLine();
 				words = line.split(" ");
 				for (int i = 0; i < words.length; i++) 
-					temp.books.add(books.get(Integer.parseInt(words[i])));				
+					temp.books.add(books.get(Integer.parseInt(words[i])));	
+				//Calculate librar's weight
 				temp.weight  = CalculateWeight(temp);
 				
+				//Libraries's books is sorted by books score
 				Collections.sort(temp.books, ScoreComparator);
+				//Add library into arraylist
 				libraries.add(temp);
 				
 
@@ -200,6 +209,7 @@ public class Main {
 		br.close();
 	}
 	
+	//Calculate weight function for libraries
 	static double CalculateWeight(Library lib) {
 		int weight = 0;
 		
@@ -208,13 +218,14 @@ public class Main {
 		
 		if(lib.sign_time == 0)
 			return Integer.MAX_VALUE;
+		
 		else {
-			return ( weight* Math.pow(lib.ship_limit,3)) / Math.pow(lib.sign_time, 2);
+			return ( weight * Math.pow(lib.ship_limit,2)) / Math.pow(lib.sign_time, 2);
 		}
 				
 	}
 	
-	
+		//Comparator function for weights
 	 static Comparator<Library> WeightComparator = new Comparator<Library>() {
 
 			public int compare(Library l1, Library l2) {
@@ -223,7 +234,7 @@ public class Main {
 			   
 			    return Double.compare(weight2, weight1)	  ;
 		    }};
-
+		//Comparator function for book scores
 	 static Comparator<Book> ScoreComparator = new Comparator<Book>() {
 
 			public int compare(Book b1, Book b2) {
@@ -235,6 +246,7 @@ public class Main {
 			
 }
 
+//Book Object
 class Book {
 	
 	int score;
@@ -248,6 +260,7 @@ class Book {
 
 }
 
+//Scan object to return multiple variables
 class ScanObject{
 	int score=0;
 	int[] prev_scanned_books ;
@@ -265,6 +278,8 @@ class ScanObject{
 	}
 }
 
+
+//Order object to keep Library_Order array. 
 class OrderObject{
 	int id;
 	ArrayList<Book> books = new ArrayList<Book>();
@@ -274,6 +289,8 @@ class OrderObject{
 		this.books = books;
 	}
 }
+
+//Library object
 class Library {
 	int id;
 	int num_books;
