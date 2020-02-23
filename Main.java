@@ -14,14 +14,15 @@ public class Main {
 									//Needed Variables
 	static int book_count= 0;
 	static int library_count = 0;
-	static int day_count = 0;
-	
+	static int day_count = 0;	
 	static ArrayList<Book> books = new ArrayList<Book>();
 	static ArrayList<Library> libraries = new ArrayList<Library>();
 	
 	static String[] filenames = { "a_example", "b_read_on", "c_incunabula", "d_tough_choices", "e_so_many_books", "f_libraries_of_the_world" } ;
-	static long[] bests = {21,5822900,5640234,4841980,4997725,5292375};
-//	static long[] bests = {0,0,0,0,0,0}; //Keeping Best Scores 
+	
+	//static long[] bests = {21,5822900,5640234,4841980,4997725,5292375};
+	static long[] bests = {0,0,0,0,0,0}; 
+	//Keeping Best Scores 
 	
 	
 	public static void main(String[] args) throws IOException {
