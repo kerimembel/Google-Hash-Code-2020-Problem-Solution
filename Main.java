@@ -1,12 +1,10 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,14 +20,15 @@ public class Main {
 	static ArrayList<Library> libraries = new ArrayList<Library>();
 	
 	static String[] filenames = { "a_example", "b_read_on", "c_incunabula", "d_tough_choices", "e_so_many_books", "f_libraries_of_the_world" } ;
-	//static long[] bests = {21,5822900,5640234,4841980,4997725,5292375};
-	static long[] bests = {0,0,0,0,0,0}; //Keeping Best Scores 
+	static long[] bests = {21,5822900,5640234,4841980,4997725,5292375};
+//	static long[] bests = {0,0,0,0,0,0}; //Keeping Best Scores 
 	
 	
 	public static void main(String[] args) throws IOException {
 		ReadFiles();	
 	}	
-										//Read files and simulate one by one 
+	
+	//Read files and simulate one by one 
 	static void ReadFiles() throws IOException {
 		
 		for (int i = 0; i < filenames.length; i++) {
@@ -50,8 +49,8 @@ public class Main {
 
 		Collections.sort(libraries, WeightComparator);			//Sort Libraries by their weights
 
-		ArrayList<OrderObject> library_order = new ArrayList<OrderObject>();	//Arraylist to keep which library signed 																
-																				//and which books are scanneed
+		ArrayList<OrderObject> library_order = new ArrayList<OrderObject>();	//ArrayList to keep which library signed 																
+																				//and which books are scanned
 		
 		//Start looking through the sorted library list in order and continue until there is time
 		for (Library lib : libraries) {
@@ -100,33 +99,31 @@ public class Main {
 			try (Writer writer = new BufferedWriter(new OutputStreamWriter(
 		              new FileOutputStream(filename+".out"), "utf-8"))) {
 		   writer.write(output);
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 		
 	}
 	
+	
+	//Scan books and pick that you did not scan before
 	static ScanObject ScanBooks(Library lib,int days_left,int[] prev_scanned_books) {
 		
 		int score = 0;
 		int book_index = 0;
 		ArrayList<Book> books_scanned_now = new ArrayList<Book>();
 		
+		//Until there are days left look for books that not scanned before
 		for (int i = 0; i < days_left; i++) {
 			for (int j = 0; j < lib.ship_limit; j++) {
+				//Scan as many books as the library allows
 				
 				while(book_index < lib.books.size() && 1 == prev_scanned_books[lib.books.get(book_index).id]  )
 					book_index++;
 				
 				if(book_index < lib.books.size()) {
+					//If book found calculate score, mark as scanned and continue
 					books_scanned_now.add(lib.books.get(book_index));
 					score += lib.books.get(book_index).score;
 					prev_scanned_books[lib.books.get(book_index).id] = 1;
@@ -308,7 +305,3 @@ class Library {
 	}
 
 }
-	
-	
-
-
